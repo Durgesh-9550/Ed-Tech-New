@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // API Routes
 app.use("/api/v1/auth", userRoutes);
-app.use("/api/v1/payment", paymentRoutes);
+app.use("", paymentRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running");
