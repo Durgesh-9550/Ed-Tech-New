@@ -51,7 +51,7 @@ const base_url = process.env.BASE_URL;
 // API endpoint for order creation
 app.post("/order", async (req, res) => {
   try {
-    const { MUID, trasactionId, amount, name, mobile } = req.body;
+    const { MUID, trasactionId, amount, name, mobile, state } = req.body;
 
     // Validate input
     if (!trasactionId || !amount || !name || !mobile) {
@@ -67,6 +67,7 @@ app.post("/order", async (req, res) => {
       merchantUserId: MUID,
       name: name,
       amount: amount * 100, // Convert to the smallest currency unit
+      state:state,
       redirectUrl: `https://elevatemyskill.onrender.com/status/?id=${trasactionId}`, // Production
       // For testing: `http://localhost:8000/status/?id=${trasactionId}`,
       redirectMode: "POST",
