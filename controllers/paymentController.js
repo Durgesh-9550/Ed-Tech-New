@@ -1,17 +1,13 @@
 const crypto = require("crypto");
 const axios = require("axios");
 
-const merchant_id = process.env.MERCHANT_ID; // Use production value
-const salt_key = process.env.SALT_KEY; // Use production value
+const merchant_id = process.env.MERCHANT_ID;
+const salt_key = process.env.SALT_KEY;
+const prod_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay";
 
-// Uncomment for testing
-// const merchant_id = "PGTESTPAYUAT86";
-// const salt_key = "96434309-7796-489d-8924-ab56988a6076";
+console.log("MID: ", merchant_id)
+console.log("Salt Key: ", salt_key)
 
-const prod_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay"; // Production
-// For testing: const prod_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay";
-
-// Create order
 const createOrder = async (req, res) => {
   try {
     const { MUID, trasactionId, amount, name, mobile, state } = req.body;
@@ -29,9 +25,10 @@ const createOrder = async (req, res) => {
       merchantTransactionId: trasactionId,
       merchantUserId: MUID,
       name: name,
-      amount: amount * 100, // Convert to smallest currency unit
+      amount: amount * 100,
       state: state,
-      redirectUrl: `https://elevatemyskill.onrender.com/status/?id=${trasactionId}`, // Production
+      // Fix: Use template literals with backticks
+      redirectUrl: `https://elevatemyskill.onrender.com/status/?id=${trasactionId}`,
       redirectMode: "POST",
       mobileNumber: mobile,
       paymentInstrument: { type: "PAY_PAGE" },
@@ -42,6 +39,7 @@ const createOrder = async (req, res) => {
     const keyIndex = 1;
     const string = payloadMain + "/pg/v1/pay" + salt_key;
     const sha256 = crypto.createHash("sha256").update(string).digest("hex");
+    // Fix: Use template literals with backticks
     const checksum = `${sha256}###${keyIndex}`;
 
     const options = {
@@ -56,23 +54,28 @@ const createOrder = async (req, res) => {
     };
 
     const response = await axios.request(options);
-    console.log("Order creation response:", response.data);
+
+    if (!response.data.success) {
+      throw new Error(response.data.message || "Payment initialization failed");
+    }
 
     return res.json(response.data);
   } catch (error) {
-    console.error(
-      "Error creating order:",
-      error.response?.data || error.message
-    );
+    console.error("Error creating order:", error);
+
+    // Improved error response
     res.status(500).json({
       message: "Failed to create order",
       success: false,
-      error: error.response?.data || error.message,
+      error: {
+        success: false,
+        code: error.response?.status || "500",
+        details: error.message,
+      },
     });
   }
 };
 
-// Check payment status
 const checkPaymentStatus = async (req, res) => {
   try {
     const merchantTransactionId = req.query.id;
@@ -85,6 +88,7 @@ const checkPaymentStatus = async (req, res) => {
     }
 
     const keyIndex = 1;
+    // Fix: Use template literals with backticks
     const stringToHash =
       `/pg/v1/status/${merchant_id}/${merchantTransactionId}` + salt_key;
     const sha256 = crypto
@@ -95,7 +99,8 @@ const checkPaymentStatus = async (req, res) => {
 
     const options = {
       method: "GET",
-      url: `https://api.phonepe.com/apis/hermes/pg/v1/status/${merchant_id}/${merchantTransactionId}`, // Production
+      // Fix: Use template literals with backticks
+      url: `https://api.phonepe.com/apis/hermes/pg/v1/status/${merchant_id}/${merchantTransactionId}`,
       headers: {
         accept: "application/json",
         "Content-Type": "application/json",
@@ -105,7 +110,6 @@ const checkPaymentStatus = async (req, res) => {
     };
 
     const response = await axios.request(options);
-    console.log("Payment status response:", response.data);
 
     if (response.data.success === true) {
       return res.redirect("https://www.elevatemyskill.online/payment/success");
@@ -113,14 +117,15 @@ const checkPaymentStatus = async (req, res) => {
       return res.redirect("https://www.elevatemyskill.online/payment/failure");
     }
   } catch (error) {
-    console.error(
-      "Error checking payment status:",
-      error.response?.data || error.message
-    );
+    console.error("Error checking payment status:", error);
     return res.status(500).json({
       message: "Failed to check payment status",
       success: false,
-      error: error.response?.data || error.message,
+      error: {
+        success: false,
+        code: error.response?.status || "500",
+        details: error.message,
+      },
     });
   }
 };
