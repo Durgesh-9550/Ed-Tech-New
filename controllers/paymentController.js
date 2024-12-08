@@ -5,8 +5,8 @@ const merchant_id = process.env.MERCHANT_ID;
 const salt_key = process.env.SALT_KEY;
 const prod_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay";
 
-console.log("MID: ", merchant_id)
-console.log("Salt Key: ", salt_key)
+// console.log("MID: ", merchant_id)
+// console.log("Salt Key: ", salt_key)
 
 const createOrder = async (req, res) => {
   try {

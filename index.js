@@ -13,7 +13,8 @@ database.connect();
 
 // Routes
 const userRoutes = require("./routes/User");
-const paymentRoutes = require("./routes/paymentRoutes");
+const paymentOrderRoutes = require("./routes/paymentRoutes");
+const paymentStatusRoute = require("./routes/paymentStatusRoute");
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -34,7 +35,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // API Routes
 app.use("/api/v1/auth", userRoutes);
-app.use("/api/v1/payment", paymentRoutes);
+app.use("/api/v1/payment", paymentOrderRoutes);
+app.use("", paymentStatusRoute);
 
 app.get("/", (req, res) => {
   res.send("API is running");
