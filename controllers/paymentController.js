@@ -17,10 +17,10 @@ const prod_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay";
 
 const createOrder = async (req, res) => {
   try {
-    const { MUID, trasactionId, amount, name, mobile, state } = req.body;
+    const { MUID, transactionId, amount, name, mobile, state } = req.body;
 
     // Validate input
-    if (!trasactionId || !amount || !name || !mobile || !state) {
+    if (!transactionId || !amount || !name || !mobile || !state) {
       return res.status(400).json({
         message: "Missing required fields",
         success: false,
@@ -29,13 +29,13 @@ const createOrder = async (req, res) => {
 
     const data = {
       merchantId: merchant_id,
-      merchantTransactionId: trasactionId,
+      merchantTransactionId: transactionId,
       merchantUserId: MUID,
       name: name,
       amount: amount * 100,
       state: state,
-      redirectUrl: `https://elevatemyskill.onrender.com/status/?id=${trasactionId}`,
-      // redirectUrl: `http://localhost:8000/status/?id=${trasactionId}`,
+      redirectUrl: `https://elevatemyskill.onrender.com/status/?id=${transactionId}`,
+      // redirectUrl: `http://localhost:8000/status/?id=${transactionId}`,
       redirectMode: "POST",
       mobileNumber: mobile,
       paymentInstrument: { type: "PAY_PAGE" },
