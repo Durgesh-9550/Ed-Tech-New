@@ -15,6 +15,7 @@ database.connect();
 const userRoutes = require("./routes/User");
 const paymentOrderRoutes = require("./routes/paymentRoutes");
 const paymentStatusRoute = require("./routes/paymentStatusRoute");
+const sendMailRoutes = require("./routes/contactUs");
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -22,6 +23,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 
 // app.use(cors());
 
@@ -37,6 +39,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1/auth", userRoutes);
 app.use("/api/v1/payment", paymentOrderRoutes);
 app.use("", paymentStatusRoute);
+app.use("/api/v1", sendMailRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running");
